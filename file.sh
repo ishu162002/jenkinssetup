@@ -14,4 +14,4 @@ sudo mount --bind /var/tmp_disk /tmp
 echo '/var/tmp_disk /tmp none bind 0 0' | sudo tee -a /etc/fstab
 sudo systemctl mask tmp.mount
 df -h /tmp
-sudo systemct1 restart jenkins
+sudo systemctl restart jenkins
