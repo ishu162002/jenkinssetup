@@ -1,11 +1,28 @@
-yum install java-17-amazon-corretto -у 
-wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.108/bin/apache-tomcat-9.0.108.tar.gz 
-tar -zxvf apache-tomcat-9.0.108.tar.gz 
-sed -i '56 a<role rolename="manager-gui"/>' apache-tomcat-9.0.108/conf/tomcat-users.xml 
-sed -i '57 a<role rolename="manager-script"/>' apache-tomcat-9.0.108/conf/tomcat-users.xml 
-sed -i '58 a<user username="tomcat" password="admin@123" roles="manager-gui, manager-script"/>' apache-tomcat-9.0.108/conf/tomcat-users.xml 
-sed -i '59 a</tomcat-users>' apache-tomcat-9.0.108/conf/tomcat-users.xml 
-sed -i '56d' apache-tomcat-9.0.108/conf/tomcat-users.xml 
-sed -i '21d' apache-tomcat-9.0.108/webapps/manager/META-INF/context.xml 
-sed -i '22d' apache-tomcat-9.0.108/webapps/manager/META-INF/context.xml 
-sh apache-tomcat-9.0.108/bin/startup.sh
+#!/bin/bash
+#!/bin/bash
+# Install Java
+sudo yum update -y
+sudo yum install -y java-17-amazon-corretto wget tar
+
+# Download & extract Tomcat
+wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.108/bin/apache-tomcat-9.0.108.tar.gz
+tar -zxvf apache-tomcat-9.0.108.tar.gz
+mv apache-tomcat-9.0.108 tomcat
+
+# Configure Tomcat user properly
+cat > tomcat/conf/tomcat-users.xml <<EOL
+<tomcat-users>
+    <role rolename="manager-gui"/>
+    <role rolename="manager-script"/>
+    <role rolename="manager-status"/>
+    <user username="tomcat" password="admin@123" roles="manager-gui,manager-script,manager-status"/>
+</tomcat-users>
+EOL
+
+# Allow external access by removing <Valve restriction>
+sed -i '/Valve/d' tomcat/webapps/manager/META-INF/context.xml
+sed -i '/Valve/d' tomcat/webapps/host-manager/META-INF/context.xml
+
+# Start Tomcat
+sh tomcat/bin/startup.sh
+
